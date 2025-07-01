@@ -1,0 +1,187 @@
+{
+  "version": "0.5.1",
+  "createTimestamp": 1750777703088,
+  "modifyTimestamp": 1750777703088,
+  "uri": "file:/Users/shuningliu/Desktop/Research_25/project.qpproj",
+  "lastID": 4,
+  "images": [
+    {
+      "serverBuilder": {
+        "builderType": "uri",
+        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
+        "uri": "file:/Users/shuningliu/Downloads/MTA3-8_GPC3%20(2).svs",
+        "args": [],
+        "metadata": {
+          "name": "MTA3-8_GPC3 (2).svs",
+          "width": 101591,
+          "height": 62506,
+          "sizeZ": 1,
+          "sizeT": 1,
+          "channelType": "DEFAULT",
+          "isRGB": true,
+          "pixelType": "UINT8",
+          "levels": [
+            {
+              "downsample": 1.0,
+              "width": 101591,
+              "height": 62506
+            },
+            {
+              "downsample": 4.0,
+              "width": 25397,
+              "height": 15626
+            },
+            {
+              "downsample": 16.0,
+              "width": 6349,
+              "height": 3906
+            },
+            {
+              "downsample": 32.0,
+              "width": 3174,
+              "height": 1953
+            }
+          ],
+          "channels": [
+            {
+              "name": "Red",
+              "color": -65536
+            },
+            {
+              "name": "Green",
+              "color": -16711936
+            },
+            {
+              "name": "Blue",
+              "color": -16776961
+            }
+          ],
+          "pixelCalibration": {
+            "pixelWidth": {
+              "value": 0.2532,
+              "unit": "µm"
+            },
+            "pixelHeight": {
+              "value": 0.2532,
+              "unit": "µm"
+            },
+            "zSpacing": {
+              "value": 1.0,
+              "unit": "z-slice"
+            },
+            "timeUnit": "SECONDS",
+            "timepoints": []
+          },
+          "magnification": 40.0,
+          "preferredTileWidth": 240,
+          "preferredTileHeight": 240
+        }
+      },
+      "entryID": 1,
+      "randomizedName": "651b6069-2e91-4143-85f5-2efcce9b02e4",
+      "imageName": "MTA3-8_GPC3 (2).svs",
+      "metadata": {}
+    },
+    {
+      "serverBuilder": {
+        "builderType": "uri",
+        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
+        "uri": "file:/Users/shuningliu/Downloads/MTA3-3_GPC3.svs",
+        "args": [],
+        "metadata": {
+          "name": "MTA3-3_GPC3.svs",
+          "width": 103583,
+          "height": 60552,
+          "sizeZ": 1,
+          "sizeT": 1,
+          "channelType": "DEFAULT",
+          "isRGB": true,
+          "pixelType": "UINT8",
+          "levels": [
+            {
+              "downsample": 1.0,
+              "width": 103583,
+              "height": 60552
+            },
+            {
+              "downsample": 4.0,
+              "width": 25895,
+              "height": 15138
+            },
+            {
+              "downsample": 16.0,
+              "width": 6473,
+              "height": 3784
+            },
+            {
+              "downsample": 32.0,
+              "width": 3236,
+              "height": 1892
+            }
+          ],
+          "channels": [
+            {
+              "name": "Red",
+              "color": -65536
+            },
+            {
+              "name": "Green",
+              "color": -16711936
+            },
+            {
+              "name": "Blue",
+              "color": -16776961
+            }
+          ],
+          "pixelCalibration": {
+            "pixelWidth": {
+              "value": 0.2532,
+              "unit": "µm"
+            },
+            "pixelHeight": {
+              "value": 0.2532,
+              "unit": "µm"
+            },
+            "zSpacing": {
+              "value": 1.0,
+              "unit": "z-slice"
+            },
+            "timeUnit": "SECONDS",
+            "timepoints": []
+          },
+          "magnification": 40.0,
+          "preferredTileWidth": 240,
+          "preferredTileHeight": 240
+        }
+      },
+      "entryID": 2,
+      "randomizedName": "2bf68f8a-3ccc-41a0-ada7-5e2a2f011806",
+      "imageName": "MTA3-3_GPC3.svs",
+      "metadata": {}
+    },
+    {
+      "serverBuilder": {
+        "builderType": "uri",
+        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
+        "uri": "file:/Users/shuningliu/Downloads/MTA3-1_GPC3.svs",
+        "args": []
+      },
+      "entryID": 3,
+      "randomizedName": "cd1b924c-4d11-48e9-b795-ddb1e4dd5684",
+      "imageName": "MTA3-1_GPC3.svs",
+      "metadata": {}
+    },
+    {
+      "serverBuilder": {
+        "builderType": "uri",
+        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
+        "uri": "file:/Users/shuningliu/Downloads/MTA3-2_GPC3.svs",
+        "args": []
+      },
+      "entryID": 4,
+      "randomizedName": "aed27d4b-057e-4990-94d5-7cc69bec3fa0",
+      "imageName": "MTA3-2_GPC3.svs",
+      "metadata": {}
+    }
+  ]
+}
