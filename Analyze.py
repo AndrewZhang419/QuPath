@@ -28,22 +28,24 @@ colors = [-377282,
 
 mask_patches = False  # if we woud like to blackout the space around the object of interest, this is determined by how the model was trained
 
-json_fname = r'1L1_nuclei_reg.json'  # input geojson file
+json_fname = r'MTA38GPC.json'  # input geojson file
 json_annotated_fname = r'1L1_nuclei_reg_anno.json'  # target output geojson file
 model_fname = "lymph_model.pth"  # DL model to use
-wsi_fname = "1L1_-_2019-09-10_16.44.58.ndpi"  # whole slide image fname to load cells from which coincide with the json file
+wsi_fname = "MTA3-8_GPC3.svs"  # whole slide image fname to load cells from which coincide with the json file
 
 # -
 
 import os
+import openslide
 
-openslide = os.getcwd() + "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/openslide/bin"
-os.environ['PATH'] = openslide + ";" + os.environ['PATH']
+print("Looking for file:", os.path.abspath(wsi_fname))
+print("File exists?", os.path.exists(wsi_fname))
 
-os.environ['PATH'] = '/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/openslide/bin' + ';' + os.environ[
+print("Current directory:", os.getcwd())
+
+os.environ['PATH'] = '~/Documents/GitHub/QuPath' + ';' + os.environ[
     'PATH']  # can either specify openslide bin path in PATH, or add it dynamically
 
-import openslide
 from tqdm.autonotebook import tqdm
 from math import ceil
 import matplotlib.pyplot as plt
@@ -95,14 +97,15 @@ allshapes = [shape(obj["nucleusGeometry"] if "nucleusGeometry" in obj.keys() els
 allcenters = [s.centroid for s in allshapes]
 print("done converting")
 
-for i in range(len(allshapes)):
-    allcenters[i].id = i
+
+###for i in range(len(allshapes)):
+    ###allcenters[i] = i
 
 searchtree = STRtree(allcenters)
 print("done building tree")
 
 # +
-osh = openslide .OpenSlide(wsi_fname)
+osh = openslide.OpenSlide(wsi_fname)
 nrow, ncol = osh.level_dimensions[0]
 nrow = ceil(nrow / tilesize)
 ncol = ceil(ncol / tilesize)
@@ -162,7 +165,7 @@ for y in tqdm(range(0, osh.level_dimensions[0][1], round(tilesize * scalefactor)
 
             # ---- get results
             # classids.append(torch.argmax( model.img2class(batch_arr_gpu),dim=1).detach().cpu().numpy())
-            classids.append(np.random.choice([0, 1], arr_out_gpu.shape[0]))
+            classids.append(np.random.choice([0, 1], batch_arr_gpu.shape[0]))
         classids = np.hstack(classids)
 
         for id, classid in zip(id_out, classids):
