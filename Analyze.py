@@ -21,7 +21,7 @@ patchsize = 32                # patch size needed by our DL model
 minhits = 100                 # minimum objects per tile to process
 batchsize = 1024              # number of patches per batch for inference
 nclasses = 2                  # number of output classes for the model
-classnames = ["Other", "Lymphocyte"]  # class names for QuPath visualization
+classnames = ["negative", "positive"]  # class names for QuPath visualization
 colors = [-377282, -9408287]  # corresponding RGB colors for those classes
 
 mask_patches = False          # blackout background around objects if trained that way

@@ -78,7 +78,7 @@
         }
       },
       "entryID": 1,
-      "randomizedName": "628270fe-2425-4bc4-bfa6-d3a8e0540c2c",
+      "randomizedName": "94040172-2b60-4d31-80a9-9787b0fbcf09",
       "imageName": "MTA3-8_GPC3 (2).svs",
       "metadata": {}
     },
@@ -155,32 +155,8 @@
         }
       },
       "entryID": 2,
-      "randomizedName": "ed857c3c-6a20-4723-82fe-076d33489954",
+      "randomizedName": "0bfc9273-3dbe-4453-bc41-a1f0ebe4eb94",
       "imageName": "MTA3-3_GPC3.svs",
-      "metadata": {}
-    },
-    {
-      "serverBuilder": {
-        "builderType": "uri",
-        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
-        "uri": "file:/Users/shuningliu/Downloads/MTA3-1_GPC3.svs",
-        "args": []
-      },
-      "entryID": 3,
-      "randomizedName": "0ac23917-c68c-4a81-9a70-43ac50eb7b82",
-      "imageName": "MTA3-1_GPC3.svs",
-      "metadata": {}
-    },
-    {
-      "serverBuilder": {
-        "builderType": "uri",
-        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
-        "uri": "file:/Users/shuningliu/Downloads/MTA3-2_GPC3.svs",
-        "args": []
-      },
-      "entryID": 4,
-      "randomizedName": "052dc12c-1b2a-4015-80c3-5da845c2b7fa",
-      "imageName": "MTA3-2_GPC3.svs",
       "metadata": {}
     }
   ]
