@@ -158,18 +158,6 @@
       "randomizedName": "0bfc9273-3dbe-4453-bc41-a1f0ebe4eb94",
       "imageName": "MTA3-3_GPC3.svs",
       "metadata": {}
-    },
-    {
-      "serverBuilder": {
-        "builderType": "uri",
-        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
-        "uri": "file:/Users/shuningliu/Downloads/MTA3-2_GPC3.svs",
-        "args": []
-      },
-      "entryID": 4,
-      "randomizedName": "fb28aefa-20ab-4f34-aecf-8312433dd126",
-      "imageName": "MTA3-2_GPC3.svs",
-      "metadata": {}
     }
   ]
 }

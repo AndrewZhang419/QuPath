@@ -56,7 +56,7 @@ df = pd.DataFrame(records)
 
 sns.set(style="whitegrid")
 plt.figure(figsize=(8, 6))
-sns.violinplot(x="Class", y="Count", hue="Class", data=df, inner="quartile", palette="Set2", legend=False)
+sns.violinplot(x="Class", y="Count", hue="Class", cut=0, data=df, inner="quartile", palette="Set2", legend=False)
 plt.title("Per-Tile Cell Counts by Class")
 plt.ylabel("Cells per Tile")
 plt.tight_layout()
