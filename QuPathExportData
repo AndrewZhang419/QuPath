@@ -47,5 +47,5 @@ rects.eachWithIndex { ann, idx ->
     outFile.withWriter('UTF-8') { writer ->
         gson.toJson(inRegion, writer)
     }
-    print "✅ Exported ${inRegion.size()} cells for '${annName}' → ${outfname}\n"
+    print "Exported ${inRegion.size()} cells for '${annName}' → ${outfname}\n"
 }
