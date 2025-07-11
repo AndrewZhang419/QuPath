@@ -1,0 +1,5 @@
+cd ~/Documents/GitHub/QuPath
+python Wplot.py \
+  -J "/Users/shuningliu/Desktop/Andrew Zhang/Qupath_Project" \
+  -w "/Users/shuningliu/Desktop/Andrew Zhang/-w/MTA3-8_GPC3 (4).svs"
+
