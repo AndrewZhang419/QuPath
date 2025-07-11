@@ -3,7 +3,7 @@
   "createTimestamp": 1750777703088,
   "modifyTimestamp": 1750777703088,
   "uri": "file:/Users/shuningliu/Documents/GitHub/QuPath/project.qpproj",
-  "lastID": 6,
+  "lastID": 7,
   "images": [
     {
       "serverBuilder": {
@@ -78,7 +78,7 @@
         }
       },
       "entryID": 1,
-      "randomizedName": "f7516793-cafe-4030-9e2f-c054029721fc",
+      "randomizedName": "1ee02e6d-30a6-4a2a-9c08-15c132cefc80",
       "imageName": "MTA3-8_GPC3 (2).svs",
       "metadata": {}
     },
@@ -155,8 +155,20 @@
         }
       },
       "entryID": 2,
-      "randomizedName": "c254a88c-59ed-4978-bf0a-c6ebf12b3c4e",
+      "randomizedName": "13650d66-da34-4de4-bdad-53abc442c9fa",
       "imageName": "MTA3-3_GPC3.svs",
+      "metadata": {}
+    },
+    {
+      "serverBuilder": {
+        "builderType": "uri",
+        "providerClassName": "qupath.lib.images.servers.openslide.OpenslideServerBuilder",
+        "uri": "file:/Users/shuningliu/Desktop/Andrew%20Zhang/Qupath_Project/MTA3-1_GPC3.svs",
+        "args": []
+      },
+      "entryID": 7,
+      "randomizedName": "cec271b0-1e4b-4a05-81b3-150eff74c0ad",
+      "imageName": "MTA3-1_GPC3.svs",
       "metadata": {}
     }
   ]

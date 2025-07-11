@@ -1,26 +1,51 @@
-// --- remove measurements, not needed but makes file smaller
-Set annotationMeasurements = []
+// == Imports ==
+import qupath.lib.objects.PathCellObject
+import qupath.lib.roi.RectangleROI
+import qupath.lib.io.GsonTools
+import java.net.URLDecoder
 
-getDetectionObjects().each{it.getMeasurementList().getMeasurementNames().each{annotationMeasurements << it}}
-//println(annotationMeasurements)
+// (1) Strip out unwanted measurements
+def allDetections = getDetectionObjects()
+def allNames      = allDetections.collectMany {
+    it.getMeasurementList().getMeasurementNames()
+}.unique()
+allNames.each { name ->
+    removeMeasurements(PathCellObject, name)
+}
 
-annotationMeasurements.each{ removeMeasurements(qupath.lib.objects.PathCellObject, it);}
-
-
-// write to file
-boolean prettyPrint = false // false results in smaller file sizes and thus faster loading times, at the cost of nice formating
+// (2) Prepare JSON writer
+boolean prettyPrint = false
 def gson = GsonTools.getInstance(prettyPrint)
-def annotations = getDetectionObjects()
-//println gson.toJson(annotations) // you can check here but this will be HUGE and take a long time to parse
 
+// Decode the file path
+def rawPath   = getCurrentImageData().getServer().getPath()
+def imagePath = rawPath.split("file:/")[1]
+def decodedPA = URLDecoder.decode(imagePath, "UTF-8")
 
-// automatic output filename, otherwise set explicitly
-String imageLocation = getCurrentImageData().getServer().getPath()
-outfname = imageLocation.split("file:/")[1]+".json"
+// (3) Loop over rectangle annotations
+def rects = getAnnotationObjects().findAll { it.getROI() instanceof RectangleROI }
+if (rects.isEmpty()) {
+    print '⚠️ No rectangle annotations found – draw one first.'
+    return
+}
 
+rects.eachWithIndex { ann, idx ->
+    def roi = ann.getROI()
+    // *** Fixed centroid call here ***
+    def inRegion = allDetections.findAll { det ->
+        def x = det.getROI().getCentroidX()
+        def y = det.getROI().getCentroidY()
+        roi.contains(x, y)
+    }
 
+    def annName  = ann.getName() ?: "rect${idx+1}"
+    def outfname = "${decodedPA}_${annName}.json"
 
-File file = new File(outfname)
-file.withWriter('UTF-8') {
-    gson.toJson(annotations,it)
+    def outFile = new File(outfname)
+    outFile.parentFile?.mkdirs()
+
+    outFile.withWriter('UTF-8') { writer ->
+        gson.toJson(inRegion, writer)
+    }
+    print "✅ Exported ${inRegion.size()} cells for '${annName}' → ${outfname}\n"
 }
