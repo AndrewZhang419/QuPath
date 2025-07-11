@@ -25,7 +25,7 @@ def decodedPA = URLDecoder.decode(imagePath, "UTF-8")
 // (3) Loop over rectangle annotations
 def rects = getAnnotationObjects().findAll { it.getROI() instanceof RectangleROI }
 if (rects.isEmpty()) {
-    print '⚠️ No rectangle annotations found – draw one first.'
+    print 'No rectangle annotations found'
     return
 }
 
