@@ -37,8 +37,7 @@ def analyze_json(json_path, wsi_path, level=0, tilesize=10000):
 
     # Extract only the number after "rect"
     basename = os.path.splitext(os.path.basename(json_path))[0]
-    match = re.search(r'rect(\d+)', basename)
-    annotation_label = match.group(1) if match else basename
+    annotation_label = basename
     dfc['Annotation'] = annotation_label
 
     return dfc
@@ -83,34 +82,34 @@ def main():
     plt.figure(figsize=(max(12, len(files) * 0.6), 6))
     sns.set(style="whitegrid")
 
-  ###  ax = sns.stripplot(
-  ###      x='Annotation', y='Log2Count', hue='Class', data=df,
-  ###      dodge=True, jitter=0.3, size=1, color='gray', alpha=0.3,
-  ###      hue_order=['Negative', 'Positive'],
-  ###      legend=False
-  ###  )
+    ax = sns.stripplot(
+       x='Annotation', y='Log2Count', hue='Class', data=df,
+       dodge=True, jitter=0.3, size=1, color='gray', alpha=0.3,
+       hue_order=['Negative', 'Positive'],
+       legend=False
+    )
 
-  ###  sns.boxplot(
-  ###      x='Annotation', y='Log2Count', hue='Class', data=df,
-  ###      width=0.3, dodge=True, saturation=1.0,
-  ###      palette={'Negative': 'steelblue', 'Positive': 'firebrick'},
-  ###      boxprops={'edgecolor': 'black', 'linewidth': 1},
-  ###      whiskerprops={'color': 'black', 'linewidth': 1},
-  ###      capprops={'color': 'black', 'linewidth': 1},
-  ###      medianprops={'color': 'black', 'linewidth': 1},
-  ###      flierprops={'marker': ' '},
-  ###      hue_order=['Negative', 'Positive'],
-  ###      ax=ax
-  ###  )
+    sns.boxplot(
+        x='Annotation', y='Log2Count', hue='Class', data=df,
+        width=0.3, dodge=True, saturation=1.0,
+        palette={'Negative': 'steelblue', 'Positive': 'firebrick'},
+        boxprops={'edgecolor': 'black', 'linewidth': 1},
+        whiskerprops={'color': 'black', 'linewidth': 1},
+        capprops={'color': 'black', 'linewidth': 1},
+        medianprops={'color': 'black', 'linewidth': 1},
+        flierprops={'marker': ' '},
+        hue_order=['Negative', 'Positive'],
+        ax=ax
+    )
 
 ###if function doesn't work or says line error, make sure to just add 4 spaces
 
-    ax = sns.violinplot(
-        x='Annotation', y='Log2Count', hue='Class', data=df,
-        split=True, inner='quartile',
-        palette={'Negative': 'steelblue', 'Positive': 'firebrick'},
-        hue_order=['Negative', 'Positive']
-    )
+   ### ax = sns.violinplot(
+   ###     x='Annotation', y='Log2Count', hue='Class', data=df,
+   ###     split=True, inner='quartile',
+   ###     palette={'Negative': 'steelblue', 'Positive': 'firebrick'},
+   ###     hue_order=['Negative', 'Positive']
+   ### )
 
     ymin, ymax = ax.get_ylim()
     for i in range(len(files)):
