@@ -1,88 +1,79 @@
-// === Imports ===
+
+
+
 import qupath.ext.stardist.StarDist2D
 import qupath.opencv.ops.ImageOps
 import qupath.lib.regions.RegionRequest
 import qupath.lib.images.ImageData
-import qupath.imagej.tools.IJTools
-import qupath.imagej.images.servers.ImageJServerBuilder
-import ij.IJ
-import ij.ImagePlus
+import qupath.lib.scripting.QP
+import javafx.application.Platform
 import javax.swing.JFileChooser
 import java.nio.file.Paths
 
-// === Model file selection ===
+
 def defaultWin = "C:/Users/shuningliu/Desktop/stardist/dsb2018.pb"
 def defaultMac = Paths.get(System.getProperty("user.home"), "Desktop", "stardist", "dsb2018.pb").toString()
 File mf = new File(defaultMac).exists() ? new File(defaultMac) : new File(defaultWin)
-String modelPath
-if (!mf.exists()) {
-    print "Could not find dsb2018.pb"
+String modelPath = mf.exists() ? mf.getAbsolutePath() : null
+if (modelPath == null) {
     def chooser = new JFileChooser()
     chooser.setDialogTitle("Select dsb2018.pb model")
     if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-        mf = chooser.getSelectedFile()
-        modelPath = mf.getAbsolutePath()
+        modelPath = chooser.getSelectedFile().absolutePath
     } else {
         print "ERROR: No model selected – aborting."
         return
     }
-} else {
-    modelPath = mf.getAbsolutePath()
 }
 print "Using model: $modelPath"
 
-// === Grab current image & annotation ===
+
 def imageData = getCurrentImageData()
-def annots    = getSelectedObjects()
+def annots = getSelectedObjects()
 if (annots.isEmpty()) {
-    print "ERROR: No annotation selected. Please draw/select a rectangle."
+    print "ERROR: No annotation selected. Draw or select one first."
     return
 }
 def annotation = annots[0]
 
-// === Build RegionRequest at 0.5× downsampling ===
+
 def request = RegionRequest.createInstance(
     imageData.getServer().getPath(),
-    0.5,
+    1.0,
     [annotation.getROI()]
 )
 
-// === Extract ROI to ImagePlus & calibrate ===
-ImagePlus imp = IJTools.extractHyperstack(imageData.getServer(), request)
-IJTools.calibrateImagePlus(imp, request, imageData.getServer())
 
-// === ImageJ preprocessing filters ===
-IJ.run(imp, "Gaussian Blur...", "sigma=1")
-IJ.run(imp, "Unsharp Mask...", "radius=2 mask=0.6")
-IJ.run(imp, "Subtract Background...", "rolling=50")
-IJ.run(imp, "Enhance Local Contrast (CLAHE)", "block=127 histogram=256 maximum=3 mask=*None*")
-IJ.run(imp, "Median...", "radius=2")
-
-// === Save processed ROI to temp TIFF and reopen as ImageServer ===
-def tmpFile = File.createTempFile("qupath_processed_", ".tif")
-IJ.save(imp, tmpFile.getAbsolutePath())
-def serverProcessed = new ImageJServerBuilder().buildServer(tmpFile.toURI())
-def processedData   = new ImageData(serverProcessed, imageData.getHierarchy())
-
-// === Configure and run StarDist on processed image ===
-def stains = processedData.getColorDeconvolutionStains()
+def stains = imageData.getColorDeconvolutionStains()
 def stardist = StarDist2D.builder(modelPath)
         .preprocess(
+            // 1) Deconvolution to separate DAB
             ImageOps.Channels.deconvolve(stains),
-            ImageOps.Channels.extract(0)
+            // 2) Extract DAB channel
+            ImageOps.Channels.extract(0),
+            // 3) Gaussian blur (σ=1)
+            ImageOps.Filters.gaussianBlur(1.0),
+            // 4) Median filter (radius=2)
+            ImageOps.Filters.median(2),
+            // 5) Morphological opening (radius=2)
+            ImageOps.Filters.opening(2),
+            // 6) Morphological closing (radius=2)
+            ImageOps.Filters.closing(2)
         )
         .threshold(0.5)
-        .normalizePercentiles(1,99)
-        .pixelSize(0.5)
+        .normalizePercentiles(1, 99)
+        .pixelSize(1.0)
         .cellExpansion(5.0)
         .measureShape()
         .measureIntensity()
         .includeProbability(false)
         .build()
-stardist.detectObjects(processedData, [annotation])
+
+
+stardist.detectObjects(imageData, [annotation])
 stardist.close()
 
-// === Compute DAB/Hema Ratio, classify, and export CSV ===
+
 getCellObjects().each { cell ->
     def m   = cell.getMeasurementList()
     def dab = m.get("Nucleus: DAB OD mean")
@@ -95,13 +86,16 @@ getCellObjects().each { cell ->
     else                 cell.setName("Negative")
 }
 
-def resultsDir  = buildFilePath(PROJECT_BASE_DIR, 'results'); mkdirs(resultsDir)
-def resultsPath = buildFilePath(resultsDir, getProjectEntry().getImageName() + '_cells.csv')
-saveCellMeasurements(resultsPath)
-print "Done — results saved to:\n  $resultsPath"
 
-// === Refresh overlay and show measurement table ===
-def hierarchy = getCurrentHierarchy()
-def root      = hierarchy.getRootObject()
-hierarchy.fireHierarchyUpdate(root, true)
-runCommand('Show measurement table')
+def resultsDir  = QP.buildFilePath(QP.PROJECT_BASE_DIR, 'results'); mkdirs(resultsDir)
+def resultsPath = QP.buildFilePath(resultsDir, getProjectEntry().getImageName() + '_cells.csv')
+saveCellMeasurements(resultsPath)
+print "Done — results saved to: $resultsPath"
+
+
+QP.fireHierarchyUpdate()
+Platform.runLater {
+    // Use Commands to open the measurement table on the JavaFX thread
+    def gui = qupath.lib.gui.scripting.QPEx.getQuPath()
+    qupath.lib.gui.commands.Commands.showCellMeasurementTable(gui, getCurrentImageData())
+}
