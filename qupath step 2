@@ -1,0 +1,17 @@
+// GPC3_Deconvolve.ijm — Fiji macro
+args = getArgument();
+tokens = split(args, ",");
+
+inputPath = tokens[0];
+outputPath = tokens[1];
+
+open(inputPath);
+run("Colour Deconvolution", "vectors=[H DAB]");
+selectWindow("Colour_2"); // DAB (brown GPC3)
+rename("GPC3_DAB");
+
+setAutoThreshold("Default dark");
+run("Convert to Mask");
+run("Fill Holes");
+run("Watershed");
+saveAs("Tiff", outputPath);

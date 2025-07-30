@@ -1,11 +1,11 @@
-// Imports
+
 import qupath.ext.stardist.StarDist2D
 import qupath.opencv.ops.ImageOps
 import qupath.lib.regions.RegionRequest
 import javax.swing.JFileChooser
 import java.nio.file.Paths
 
-// 1) Locate your single‐channel model (dsb2018.pb) on Windows or macOS
+
 def defaultWin = "C:/Users/shuningliu/Desktop/stardist/dsb2018.pb"
 def defaultMac = Paths.get(System.getProperty("user.home"), "Desktop", "stardist", "dsb2018.pb").toString()
 File mf = new File(defaultMac).exists() ? new File(defaultMac) : new File(defaultWin)
@@ -26,7 +26,7 @@ if (!mf.exists()) {
 }
 print "Using model: $modelPath"
 
-// 2) Grab the current image & your selected annotation (rectangle)
+
 def imageData = getCurrentImageData()
 def annots    = getSelectedObjects()
 if (annots.isEmpty()) {
@@ -35,14 +35,14 @@ if (annots.isEmpty()) {
 }
 def annotation = annots[0]
 
-// 3) Request that region at 0.5× downsample
+
 def request = RegionRequest.createInstance(
     imageData.getServer().getPath(),
     0.5,
     [ annotation.getROI() ]
 )
 
-// 4) Build StarDist with a two‐step preprocess: deconvolve → extract hematoxylin
+
 def stains = imageData.getColorDeconvolutionStains()
 def stardist = StarDist2D.builder(modelPath)
         .preprocess(
@@ -58,11 +58,11 @@ def stardist = StarDist2D.builder(modelPath)
         .includeProbability(false)
         .build()
 
-// 5) Run detection
+
 stardist.detectObjects(imageData, [annotation])
 stardist.close()
 
-// 6) Classify by DAB vs Hematoxylin OD using MeasurementList.get(...)
+
 getCellObjects().each { cell ->
     def m   = cell.getMeasurementList()
     def dab = m.get("Nucleus: DAB OD mean")
@@ -75,7 +75,7 @@ getCellObjects().each { cell ->
     else                 cell.setName("Negative")
 }
 
-// 7) Save measurements
+
 def resultsDir  = buildFilePath(PROJECT_BASE_DIR, 'results'); mkdirs(resultsDir)
 def resultsPath = buildFilePath(resultsDir, getProjectEntry().getImageName() + '_cells.csv')
 saveCellMeasurements(resultsPath)

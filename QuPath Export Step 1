@@ -1,0 +1,19 @@
+//  Export selected annotation as image — compatible with QuPath 0.6.0
+
+def server = getCurrentServer()
+def annotations = getAnnotationObjects()
+
+if (annotations.isEmpty()) {
+    print " No annotation selected!"
+    return
+}
+
+def annotation = annotations[0]
+def roi = annotation.getROI()
+
+def x = roi.getBoundsX()
+def y = roi.getBoundsY()
+def width = roi.getBoundsWidth()
+def height = roi.getBoundsHeight()
+
+// Create region request from bound
