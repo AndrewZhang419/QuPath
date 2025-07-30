@@ -11,7 +11,7 @@ def defaultMac = Paths.get(System.getProperty("user.home"), "Desktop", "stardist
 File mf = new File(defaultMac).exists() ? new File(defaultMac) : new File(defaultWin)
 String modelPath
 if (!mf.exists()) {
-    print "WARNING: Could not find dsb2018.pb at\n  $defaultMac\n  $defaultWin\nPlease select it…"
+    print "Could not find dsb2018.pb"
     def chooser = new JFileChooser()
     chooser.setDialogTitle("Select dsb2018.pb model")
     if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
