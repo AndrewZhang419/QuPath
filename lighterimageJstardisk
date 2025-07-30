@@ -10,7 +10,7 @@ import ij.ImagePlus
 import javax.swing.JFileChooser
 import java.nio.file.Paths
 
-// === Model file selection ===
+// === 1) Locate or prompt for the StarDist .pb model ===
 def defaultWin = "C:/Users/shuningliu/Desktop/stardist/dsb2018.pb"
 def defaultMac = Paths.get(System.getProperty("user.home"), "Desktop", "stardist", "dsb2018.pb").toString()
 File mf = new File(defaultMac).exists() ? new File(defaultMac) : new File(defaultWin)
@@ -31,7 +31,7 @@ if (!mf.exists()) {
 }
 print "Using model: $modelPath"
 
-// === Grab current image & annotation ===
+// === 2) Grab the current image & selected annotation ===
 def imageData = getCurrentImageData()
 def annots    = getSelectedObjects()
 if (annots.isEmpty()) {
@@ -40,31 +40,31 @@ if (annots.isEmpty()) {
 }
 def annotation = annots[0]
 
-// === Build RegionRequest at 0.5× downsampling ===
+// === 3) Extract at 1.0 µm/px downsampling to reduce memory use ===
 def request = RegionRequest.createInstance(
     imageData.getServer().getPath(),
-    0.5,
+    1.0,
     [annotation.getROI()]
 )
 
-// === Extract ROI to ImagePlus & calibrate ===
+// === 4) Pull ROI into ImageJ for preprocessing ===
 ImagePlus imp = IJTools.extractHyperstack(imageData.getServer(), request)
 IJTools.calibrateImagePlus(imp, request, imageData.getServer())
 
-// === ImageJ preprocessing filters ===
+// Apply ImageJ filters
 IJ.run(imp, "Gaussian Blur...", "sigma=1")
 IJ.run(imp, "Unsharp Mask...", "radius=2 mask=0.6")
 IJ.run(imp, "Subtract Background...", "rolling=50")
 IJ.run(imp, "Enhance Local Contrast (CLAHE)", "block=127 histogram=256 maximum=3 mask=*None*")
 IJ.run(imp, "Median...", "radius=2")
 
-// === Save processed ROI to temp TIFF and reopen as ImageServer ===
+// === 5) Save processed ROI to a temp TIFF and reopen via ImageJServerBuilder ===
 def tmpFile = File.createTempFile("qupath_processed_", ".tif")
 IJ.save(imp, tmpFile.getAbsolutePath())
 def serverProcessed = new ImageJServerBuilder().buildServer(tmpFile.toURI())
 def processedData   = new ImageData(serverProcessed, imageData.getHierarchy())
 
-// === Configure and run StarDist on processed image ===
+// === 6) Configure & run StarDist on the processed, downsampled image ===
 def stains = processedData.getColorDeconvolutionStains()
 def stardist = StarDist2D.builder(modelPath)
         .preprocess(
@@ -72,17 +72,18 @@ def stardist = StarDist2D.builder(modelPath)
             ImageOps.Channels.extract(0)
         )
         .threshold(0.5)
-        .normalizePercentiles(1,99)
-        .pixelSize(0.5)
+        .normalizePercentiles(1, 99)
+        .pixelSize(1.0)
         .cellExpansion(5.0)
         .measureShape()
         .measureIntensity()
         .includeProbability(false)
         .build()
+
 stardist.detectObjects(processedData, [annotation])
 stardist.close()
 
-// === Compute DAB/Hema Ratio, classify, and export CSV ===
+// === 7) Compute DAB/Hema ratio, classify, and export results ===
 getCellObjects().each { cell ->
     def m   = cell.getMeasurementList()
     def dab = m.get("Nucleus: DAB OD mean")
@@ -100,7 +101,7 @@ def resultsPath = buildFilePath(resultsDir, getProjectEntry().getImageName() + '
 saveCellMeasurements(resultsPath)
 print "Done — results saved to:\n  $resultsPath"
 
-// === Refresh overlay and show measurement table ===
+// === 8) Refresh overlay and show measurement table ===
 def hierarchy = getCurrentHierarchy()
 def root      = hierarchy.getRootObject()
 hierarchy.fireHierarchyUpdate(root, true)
