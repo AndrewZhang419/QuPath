@@ -1,0 +1,83 @@
+// Imports
+import qupath.ext.stardist.StarDist2D
+import qupath.opencv.ops.ImageOps
+import qupath.lib.regions.RegionRequest
+import javax.swing.JFileChooser
+import java.nio.file.Paths
+
+// 1) Locate your dsb2018.pb model
+def defaultWin = "C:/Users/shuningliu/Desktop/stardist/dsb2018.pb"
+def defaultMac = Paths.get(System.getProperty("user.home"), "Desktop", "stardist", "dsb2018.pb").toString()
+File mf = new File(defaultMac).exists() ? new File(defaultMac) : new File(defaultWin)
+String modelPath
+if (!mf.exists()) {
+    println "Model not found at"
+    def chooser = new JFileChooser()
+    chooser.setDialogTitle("Select dsb2018.pb model")
+    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        mf = chooser.getSelectedFile()
+        modelPath = mf.getAbsolutePath()
+    } else {
+        println "No model selected"
+        return
+    }
+} else {
+    modelPath = mf.getAbsolutePath()
+}
+println "Using model: $modelPath"
+
+// 2) Grab the current image & your single rectangle‐annotation
+def imageData = getCurrentImageData()
+def annots    = getSelectedObjects()
+if (annots.isEmpty()) {
+    return
+}
+def annotation = annots[0]
+
+// 3) Build & run StarDist on that annotation
+def stains = imageData.getColorDeconvolutionStains()
+def stardist = StarDist2D.builder(modelPath)
+        .preprocess(
+            ImageOps.Channels.deconvolve(stains),
+            ImageOps.Channels.extract(0)
+        )
+        .threshold(0.65)
+        .normalizePercentiles(1, 99)
+        .pixelSize(0.5)
+        .cellExpansion(3.0)
+        .measureShape()
+        .measureIntensity()
+        .includeProbability(true)
+        .build()
+
+stardist.detectObjects(imageData, [annotation])
+stardist.close()
+
+// 4) Remove any detection with Probability < 0.7
+def toRemove = getCellObjects().findAll { cell ->
+    def p = cell.getMeasurementList().get("Probability")
+    p < 0.7
+}
+if (!toRemove.isEmpty()) {
+    removeObjects(toRemove, true)
+}
+
+// 5) Classify by DAB/Hema ratio and name 3+/2+/1+/Negative
+getCellObjects().each { cell ->
+    def m   = cell.getMeasurementList()
+    def dab = m.get("Nucleus: DAB OD mean")
+    def hem = m.get("Nucleus: Hematoxylin OD mean")
+    def ratio = (dab + 0.01)/(hem + 0.01)
+    m.putMeasurement("DAB/Hema Ratio", ratio)
+    if      (dab > 0.5)  cell.setName("3+")
+    else if (dab > 0.3)  cell.setName("2+")
+    else if (dab > 0.15) cell.setName("1+")
+    else                 cell.setName("Negative")
+}
+
+// 6) Save measurements
+def resultsDir  = buildFilePath(PROJECT_BASE_DIR, 'results');  mkdirs(resultsDir)
+def resultsPath = buildFilePath(resultsDir, getProjectEntry().getImageName() + '_cells.csv')
+saveCellMeasurements(resultsPath)
+
+println "Finished! Results saved to:\n  $resultsPath"
